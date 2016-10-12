@@ -1,0 +1,71 @@
+// http://mrhaki.blogspot.kr/2009/11/gradle-goodness-using-properties-for.html
+
+
+
+loadConfiguration()
+
+task printProps << {
+	println "serverName:  $config.serverName"
+	println "mail.server: $config.mail.server"
+	println "mail.port:   $config.mail.port"
+}
+
+/*
+def loadConfiguration() {
+	def environment = hasProperty('env') ? env : 'dev'
+	println "Environment is $environment"
+	
+	println getProperty('a')
+	
+	setProperty('a','avalue')
+	
+	setProperty 'environment', environment
+	println "Environment is set to $environment"
+	
+	def configFile = file('config.groovy')
+	def config = new ConfigSlurper(environment).parse(configFile.toURL())
+	setProperty 'config', config
+}
+*/
+
+// https://gist.github.com/marc0der/4095013
+def loadConfiguration() {
+    def environment = hasProperty('env') ? env : 'dev'
+    ext.environment = environment
+    println "Environment is set to: $environment"
+    
+    def configFile = file('config.groovy')
+    def config = new ConfigSlurper(environment).parse(configFile.toURL())
+    ext.config = config
+}
+
+
+/**
+// 실행결과
+E:\04_dist\gradle>gradle -q printProps
+Environment is set to: dev
+serverName:  http://localhost:9090
+mail.server: localhost
+mail.port:   25
+E:\04_dist\gradle>gradle -q -Penv=dev printProps
+Environment is set to: dev
+serverName:  http://localhost:9090
+mail.server: localhost
+mail.port:   25
+E:\04_dist\gradle>gradle -q -Penv=test printProps
+Environment is set to: test
+serverName:  http://testserver
+mail.server: mail.testserver
+mail.port:   25
+E:\04_dist\gradle>gradle -q -Penv=prod printProps
+Environment is set to: prod
+serverName:  http://www.mrhaki.com
+mail.server: mail.host.com
+mail.port:   552
+E:\04_dist\gradle>
+
+
+E:\04_dist\gradle>
+**/
+
+
